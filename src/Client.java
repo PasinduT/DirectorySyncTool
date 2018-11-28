@@ -9,6 +9,13 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.file.Paths;
 
+/**
+ * This class handles the client side of the DirectorySyncTool. It is responsible for
+ * connecting to the server and giving it the directory info file as well as, uploading 
+ * files that the server requests
+ * @author Pasindu Tennakoon
+ *
+ */
 public class Client {
 	private String homeDirectory;
 	private String filename;

@@ -33,33 +33,41 @@ public class Server
 	}
 	
 	/**
-	 * Listens and accepts requests from the
-	 * @throws IOException
+	 * Listens and accepts requests from clients. Process those requests and handle then appropriately
+	 * @throws IOException when a socket connection terminates abruptly
 	 */
 	public void listen() throws IOException 
 	{
+		// Make a new server and start listening from the port
 		ServerSocket server = new ServerSocket(port);
 		
 		while(true)
 		{
+			// Accept a new connection
 			Socket socket = server.accept();
 			DataInputStream input = new DataInputStream(socket.getInputStream());
+			
+			// Read the command from the client
 			String command = input.readUTF();
 			
+			// If the client is sending directory information, create a new thread to download that
+			// file onto the server
 			if (command.equals("DIRECINFO"))
 			{
 				FileDownloader downloader = new FileDownloader(filename, input);
 				downloader.start();
 			}
-			
+			// If the main client thread starts listening, then starting comparing the info file and the current directory
+			// and find out which files are missing and needs to be updated
 			else if (command.equals("MAIN")) 
 			{
 				FileComparer fileComparer = new FileComparer(homeDirectory, socket, filename);
 				fileComparer.start();
 			}
-			
+			// If the client is sending a file, then start a new thread and download the file
 			else if (command.startsWith("FILE"))
 			{
+				// Prints out that a file is oncoming
 				String pathName = command.substring(5);
 				System.out.println("Recieving file:" + pathName);
 				FileDownloader downloader = new FileDownloader(homeDirectory + pathName, input);
