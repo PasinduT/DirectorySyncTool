@@ -86,15 +86,23 @@ public class Client {
 	}
 	
 	public static void main(String [] a) {
-		Client c =  new Client("direcInfo.ser", "/Users/pasindutennakoon/Desktop/CS250", "localhost", 4999);
-		try {
-			c.scanAndUpdate();
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		while(true) {
+			Client c =  new Client("direcInfo.ser", "/Users/pasindutennakoon/Desktop/CS250", "localhost", 4999);
+			try {
+				Thread.sleep(3000);
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			try {
+				c.scanAndUpdate();
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 

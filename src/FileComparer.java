@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 
 /**
@@ -19,24 +20,34 @@ public class FileComparer extends Thread implements Runnable{
 	private DataOutputStream output;
 	private String homeDirectory;
 	private String pathToFile;
+	private String pathToPreviousFile;
 	
 	/**
 	 * Constructor
 	 * @param homeDirectory the directory where the backup is stored
 	 * @param socket the socket that connects to the main client thread
 	 * @param pathToFile the filename and path of the info file downloaded from the client
+	 * @param pathToPreviousFile the filename of the lastest info file representing the directory
 	 * @throws IOException when an error occurs while trying to connect to the client
+	 * @throws ClassNotFoundException 
 	 */
-	public FileComparer(String homeDirectory, Socket socket, String pathToFile) throws IOException 
+	public FileComparer(String homeDirectory, Socket socket, String pathToFile, String pathToPreviousFile) throws IOException, ClassNotFoundException 
 	{
 		this.pathToFile = pathToFile;
+		this.pathToPreviousFile = pathToPreviousFile;
 		this.socket = socket;
 		input = new DataInputStream(socket.getInputStream());
 		output = new DataOutputStream(socket.getOutputStream());
-		directory = new Directory(Paths.get(homeDirectory), "/");
-		directory.scan();
+		if (!Files.exists(Paths.get(pathToPreviousFile))) {
+			directory = new Directory(Paths.get(homeDirectory), "/");
+			directory.scan();
+		}
+		else {
+			DirectoryInfoFile directoryInfoFile = new DirectoryInfoFile();
+			directoryInfoFile.getDirectoryFromInfoFile(pathToPreviousFile);
+			this.directory = directoryInfoFile.getDirectory();
+		}
 		this.homeDirectory = homeDirectory;
-		directory.scan();
 		
 	}
 	
@@ -134,6 +145,15 @@ public class FileComparer extends Thread implements Runnable{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		try {
+			Files.deleteIfExists(Paths.get(pathToPreviousFile));
+			Files.move(Paths.get(pathToFile), Paths.get(pathToPreviousFile));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		
 	}
 }

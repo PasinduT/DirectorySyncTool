@@ -18,6 +18,7 @@ public class Server
 	private String homeDirectory;
 	private int port;
 	private String filename;
+	private String pathToPreviousFile;
 	
 	/**
 	 * Constructor
@@ -25,18 +26,20 @@ public class Server
 	 * @param homeDirectory the path of the directory where the backup will be stored into
 	 * @param port the port number which will be listening to incoming connections
 	 */
-	public Server(String filename, String homeDirectory, int port) 
+	public Server(String filename, String pathToPreviousFile, String homeDirectory, int port) 
 	{
 		this.filename = filename;
 		this.homeDirectory = homeDirectory;
 		this.port = port;
+		this.pathToPreviousFile = pathToPreviousFile;
 	}
 	
 	/**
 	 * Listens and accepts requests from clients. Process those requests and handle then appropriately
 	 * @throws IOException when a socket connection terminates abruptly
+	 * @throws ClassNotFoundException  When the directory class could not be found while scanning the directory info files
 	 */
-	public void listen() throws IOException 
+	public void listen() throws IOException, ClassNotFoundException 
 	{
 		// Make a new server and start listening from the port
 		ServerSocket server = new ServerSocket(port);
@@ -61,7 +64,7 @@ public class Server
 			// and find out which files are missing and needs to be updated
 			else if (command.equals("MAIN")) 
 			{
-				FileComparer fileComparer = new FileComparer(homeDirectory, socket, filename);
+				FileComparer fileComparer = new FileComparer(homeDirectory, socket, filename, pathToPreviousFile);
 				fileComparer.start();
 			}
 			// If the client is sending a file, then start a new thread and download the file
@@ -77,10 +80,13 @@ public class Server
 	}
 	
 	public static void main(String [] a) {
-		Server s = new Server("/Users/pasindutennakoon/Desktop/testing.ser", "/Users/pasindutennakoon/Desktop/testing", 4999);
+		Server s = new Server("/Users/pasindutennakoon/Desktop/testing.ser", "/Users/pasindutennakoon/Desktop/testing1.ser", "/Users/pasindutennakoon/Desktop/testing", 4999);
 		try {
 			s.listen();
 		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
