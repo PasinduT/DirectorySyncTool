@@ -38,10 +38,13 @@ public class FileComparer extends Thread implements Runnable{
 		this.socket = socket;
 		input = new DataInputStream(socket.getInputStream());
 		output = new DataOutputStream(socket.getOutputStream());
+		
+		// If the previous file does not exist make a new file containing the directory information
 		if (!Files.exists(Paths.get(pathToPreviousFile))) {
 			directory = new Directory(Paths.get(homeDirectory), "/");
 			directory.scan();
 		}
+		// Otherwise get the current directory information from the previous file
 		else {
 			DirectoryInfoFile directoryInfoFile = new DirectoryInfoFile();
 			directoryInfoFile.getDirectoryFromInfoFile(pathToPreviousFile);
