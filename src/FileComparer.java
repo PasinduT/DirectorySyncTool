@@ -127,6 +127,11 @@ public class FileComparer extends Thread implements Runnable{
 		}
 	}
 	
+	/**
+	 * The run method of the Thread
+	 * Initiates the directory comparison
+	 * @see java.lang.Thread#run()
+	 */
 	public void run() 
 	{
 		DirectoryInfoFile directoryInfoFile = new DirectoryInfoFile();
